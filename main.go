@@ -19,6 +19,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	//defer run after the app in everything else is done
+	defer app.DB.Close()
 
 	// http.HandleFunc("/health", HeathCheck)
 	//call the func in the routes to instead of the above comment
