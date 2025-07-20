@@ -1,3 +1,5 @@
-module github.com/VincentLAU5142/femProject
+module github.com/VincentLAU5142/FEM_project_GO
 
 go 1.24.1
+
+require github.com/go-chi/chi/v5 v5.2.2 // indirect
