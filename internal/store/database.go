@@ -6,7 +6,6 @@ import (
 	"io/fs"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/pressly/goose"
 	"github.com/pressly/goose/v3"
 )
 
@@ -21,6 +20,7 @@ func Open() (*sql.DB, error) {
 
 	return db, nil
 }
+
 func MigrateFS(db *sql.DB, migrationFS fs.FS, dir string) error {
 	goose.SetBaseFS(migrationFS)
 	defer func() {
