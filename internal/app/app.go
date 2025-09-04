@@ -48,6 +48,6 @@ func NewApplication() (*Application, error) {
 	return app, nil
 }
 
-func (a *Application) HeathCheck(w http.ResponseWriter, r *http.Request) {
+func (a *Application) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Status is available\n")
 }
