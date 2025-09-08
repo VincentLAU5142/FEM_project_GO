@@ -6,7 +6,7 @@ type Workout struct {
 	ID              int            `json:"id"`
 	Title           string         `json:"title"`
 	Description     string         `json:"description"`
-	DurationMinutes int            `json:"duration_minute"`
+	DurationMinutes int            `json:"duration_minutes"`
 	CaloriesBurned  int            `json:"calories_burned"`
 	Entries         []WorkoutEntry `json:"entries"`
 }
@@ -33,7 +33,7 @@ func NewPostgresWorkoutStore(db *sql.DB) *PostgresWorkoutStore {
 //if you use other database? the interface in here are helping you than
 //in the application layer
 //they do not care what db you use
-type WorkStore interface {
+type WorkoutStore interface {
 	CreateWorkout(*Workout) (*Workout, error)
 	GetWorkoutByID(id int64) (*Workout, error)
 }
@@ -46,8 +46,9 @@ func (pg *PostgresWorkoutStore) CreateWorkout(workout *Workout) (*Workout, error
 	defer tx.Rollback()
 
 	query :=
-		`INSERT INTO workouts (title,description,duration_minutes, calories_burned)
-		VALUES ($1, $2, $3,$4) *
+		`
+		INSERT INTO workouts (title,description,duration_minutes, calories_burned)
+		VALUES ($1, $2, $3,$4,$5) 
 		RETURNING id
 		`
 
@@ -58,12 +59,19 @@ func (pg *PostgresWorkoutStore) CreateWorkout(workout *Workout) (*Workout, error
 
 	//we also need to insert the entries
 	for _, entry := range workout.Entries {
+		// //bugs fixed from github
+		// for i := range workout.Entries {
+		// // we scan the ID into `entry` (a *Workout) to make sure changes are persisted outside of the loop's scope
+		// entry := &workout.Entries[i]
+		// //if no useful just deleted this
+		// //
 		query :=
-			`INSERT INTO workout_entries(workout_id, exercise_name,sets,reps,duration_seconds,weight, notes, order_index)
+			`
+			INSERT INTO workout_entries(workout_id, exercise_name,sets,reps,duration_seconds,weight, notes, order_index)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 			RETURNING id
 			`
-		err = tx.QueryRow(query, workout.ID, entry.ExerciseName, entry.Sets, entry.Reps, entry.DurationSeconds, entry.Weight, entry.Notes, entry.OrderIndex).Scan(entry.ID)
+		err = tx.QueryRow(query, workout.ID, entry.ExerciseName, entry.Sets, entry.Reps, entry.DurationSeconds, entry.Weight, entry.Notes, entry.OrderIndex).Scan(&entry.ID)
 		if err != nil {
 			return nil, err
 		}
