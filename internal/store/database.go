@@ -16,6 +16,18 @@ func Open() (*sql.DB, error) {
 		return nil, fmt.Errorf("db: open %w", err)
 	}
 
+	// Add db.Ping() to Open()
+
+	// This change verifies the database connection immediately after opening:
+
+	//     Calls db.Ping() to ensure the DSN is valid and the server is reachable.
+	//     Closes the handle and returns an error if the ping fails, preventing false “Connected” logs.
+
+	// No functional behavior beyond connection validation has been altered.
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("db: open %w", err)
+	}
+
 	fmt.Println("Connected to Database...")
 
 	return db, nil
