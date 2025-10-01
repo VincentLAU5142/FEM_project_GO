@@ -151,6 +151,7 @@ func (pg *PostgresWorkoutStore) GetWorkoutByID(id int64) (*Workout, error) {
 }
 
 func (pg *PostgresWorkoutStore) UpdateWorkout(Workout *Workout) error {
+	//start a database transaction in the PostgreSQL
 	tx, err := pg.db.Begin()
 	if err != nil {
 		return err
