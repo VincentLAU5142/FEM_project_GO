@@ -22,6 +22,7 @@ func NewWorkoutHandler(workoutStore store.WorkoutStore) *WorkoutHandler {
 	}
 }
 
+// update workout handler
 func (wh *WorkoutHandler) HandleGetWorkoutByID(w http.ResponseWriter, r *http.Request) {
 	paramsWorkoutID := chi.URLParam(r, "id")
 	if paramsWorkoutID == "" {
@@ -129,4 +130,15 @@ func (wh *WorkoutHandler) HandleUpdateWorkoutByID(w http.ResponseWriter, r *http
 	if updateWorkoutRequest.Entries != nil {
 		existingWorkout.Entries = updateWorkoutRequest.Entries
 	}
+
+	err = wh.workoutStore.UpdateWorkout(existingWorkout)
+	if err != nil {
+		fmt.Println("update workout error", err)
+		http.Error(w, "failed to update the workout", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(existingWorkout)
 }
